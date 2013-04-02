@@ -1,0 +1,95 @@
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+
+	sourceCompatibility = 1.7
+	version = '1.0'
+
+	repositories {
+		mavenCentral()
+		maven {
+			url 'https://repository.jboss.org/nexus/content/groups/public-jboss/'
+		}
+	}
+}
+
+project(':authority.api') {
+	dependencies {
+	    compile 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
+	}
+}
+
+project(':authority.core') {
+	dependencies {
+		compile project(':authority.api')
+		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+		compile 'org.bouncycastle:bcpkix-jdk15on:1.47'
+		compile 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
+		compile 'javax.enterprise:cdi-api:1.0'
+	}
+}
+
+project(':authority.adapter') {
+	dependencies {
+		compile project(':authority.api')
+		compile 'org.picketbox:picketbox:4.0.7.Final'
+	}
+}
+
+project(':authority.console') {
+	apply plugin: 'war'
+	apply plugin: 'eclipse-wtp'
+
+	dependencies {
+		providedCompile project(':authority.api')
+		providedCompile 'javax.faces:jsf-api:2.1'
+		providedCompile 'javax.enterprise:cdi-api:1.0'
+	}
+
+	eclipse {
+		wtp {
+			facet {
+				facet name: 'java', version: '1.7'
+				facet name: 'jst.web', version: '3.0'
+				facet name: 'jst.cdi', version: '1.0'
+				facet name: 'jst.jsf', version: '2.1'
+			}
+		}
+	}
+}
+
+project(':authority.tools') {
+	dependencies {
+		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+		compile 'org.bouncycastle:bcpkix-jdk15on:1.47'
+	}
+}
+
+project(':application.server') {
+	apply plugin: 'war'
+	apply plugin: 'eclipse-wtp'
+
+	eclipse {
+		wtp {
+			facet {
+				facet name: 'java', version: '1.7'
+				facet name: 'jst.web', version: '3.0'
+			}
+		}
+	}
+	
+	dependencies {
+		runtime(project(':authority.adapter')) { transitive = false }
+		providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+	}
+}
+
+project(':application.client') {
+	apply plugin:'application'
+	
+	mainClassName = 'cavani.endorfina.app.Main'
+	
+	dependencies {
+		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+	}
+}

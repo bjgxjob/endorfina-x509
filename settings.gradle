@@ -1,0 +1,1 @@
+include 'authority.api', 'authority.core', 'authority.console', 'authority.adapter', 'authority.tools', 'application.server', 'application.client'

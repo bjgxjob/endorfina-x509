@@ -45,7 +45,7 @@ public final class ServerCredential
 
 		bc();
 
-		final String hostname = "disruptive";
+		final String hostname = "appserver";
 
 		final X500Principal principal = new X500Principal("CN=" + hostname + ", OU=Endorfina, O=Cavani");
 

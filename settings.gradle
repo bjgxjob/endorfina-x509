@@ -1,1 +1,1 @@
-include 'authority.api', 'authority.core', 'authority.console', 'authority.adapter', 'authority.tools', 'application.server', 'application.client'
+include 'authority.api', 'authority.core', 'authority.service', 'authority.adapter', 'authority.tools', 'authority.fakeldap', 'application.server', 'application.client'

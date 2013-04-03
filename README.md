@@ -15,7 +15,7 @@ Gears
 * Authority key pair generation (self-signed)
 * Client key pair generation (Authority signed)
 * Client Certificate validation
-* Directory credential storage (LDAP)
+* Directory backend (LDAP)
 
 **Authentication**
 
@@ -33,7 +33,6 @@ Missing
 -------
 
 * Tests
-* Embedded DS
 
 Configuration
 -------------
@@ -181,6 +180,6 @@ Generated files:
 
 **FakeLdap38900**
 
-Bind to port 38900, implements LDAPv3 protocol and store in `data` folder.
+Binds to port 38900, implements LDAPv3 protocol and stores in `data` folder.
 
 `/authority.fakeldap/src/main/java/cavani/endorfina/authority/tools/FakeLdap38900.java`

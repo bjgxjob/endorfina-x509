@@ -11,6 +11,10 @@ subprojects {
 			url 'https://repository.jboss.org/nexus/content/groups/public-jboss/'
 		}
 	}
+
+	configurations {
+		container
+	}
 }
 
 project(':authority.api') {
@@ -99,5 +103,35 @@ project(':application.client') {
 	
 	dependencies {
 		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+	}
+}
+
+task deploy {
+	def deployment = [
+		'authority.api',
+		'authority.core',
+		'authority.service',
+		'application.server',
+		'bcprov-jdk15on-1.47.jar',
+		'bcpkix-jdk15on-1.47.jar',
+	]
+
+	File deploy = mkdir("deploy")
+	def projects = subprojects.findAll { it.name in deployment }
+
+	projects.each { project ->
+		project.tasks.withType(Jar).each { art ->
+			copy {
+				from art.archivePath
+				into deploy
+			}
+		}
+		project.configurations.runtime.each { dep ->
+			if (dep.name in deployment)
+				copy {
+					from dep
+					into deploy
+				}
+		}
 	}
 }

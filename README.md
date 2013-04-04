@@ -242,7 +242,11 @@ JBoss server (new Terminal must stay open)
 	
 	/subsystem=web/virtual-server=default-host:write-attribute(name="alias", value=["appserver"])
 	/subsystem=web/connector=https:add(socket-binding=https, scheme=https, protocol="HTTP/1.1", secure=true, enabled=true)
-	/subsystem=web/connector=https/ssl=configuration:add(certificate-key-file="/srv/authority/server/keystore.jks",ca-certificate-file="/srv/authority/server/truststore.jks",password="secret",key-alias="server",protocol="SSLv3",verify-client="true")
+	/subsystem=web/connector=https/ssl=configuration:add( \
+		certificate-key-file="/srv/authority/server/keystore.jks", \
+		ca-certificate-file="/srv/authority/server/truststore.jks", \
+		password="secret",key-alias="server", \
+		protocol="SSLv3",verify-client="true")
 	:reload
 	
 	/subsystem=security/security-domain=EndorfinaAuthority:add(cache-type="default")

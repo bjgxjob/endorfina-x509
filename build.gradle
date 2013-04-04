@@ -11,32 +11,37 @@ subprojects {
 			url 'https://repository.jboss.org/nexus/content/groups/public-jboss/'
 		}
 	}
-
-	configurations {
-		container
-	}
 }
+
+def dep_bcprov = 'org.bouncycastle:bcprov-jdk15on:1.47'
+def dep_bcpkix = 'org.bouncycastle:bcpkix-jdk15on:1.47'
+
+def dep_ejb3_api = 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
+def dep_cdi_api = 'javax.enterprise:cdi-api:1.0'
+def dep_jaxrs_api = 'org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_1.1_spec:1.0.1.Final'
+def dep_servlet_api = 'javax.servlet:javax.servlet-api:3.0.1'
+def dep_picketbox = 'org.picketbox:picketbox:4.0.7.Final'
 
 project(':authority.api') {
 	dependencies {
-	    compile 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
+	    compile dep_ejb3_api
 	}
 }
 
 project(':authority.core') {
 	dependencies {
 		compile project(':authority.api')
-		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
-		compile 'org.bouncycastle:bcpkix-jdk15on:1.47'
-		compile 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
-		compile 'javax.enterprise:cdi-api:1.0'
+		compile dep_bcprov
+		compile dep_bcpkix
+		compile dep_ejb3_api
+		compile dep_cdi_api
 	}
 }
 
 project(':authority.adapter') {
 	dependencies {
 		compile project(':authority.api')
-		compile 'org.picketbox:picketbox:4.0.7.Final'
+		compile dep_picketbox
 	}
 }
 
@@ -46,8 +51,8 @@ project(':authority.service') {
 
 	dependencies {
 		providedCompile project(':authority.api')
-		providedCompile 'javax.enterprise:cdi-api:1.0'
-		providedCompile 'org.jboss.spec.javax.ws.rs:jboss-jaxrs-api_1.1_spec:1.0.1.Final' 
+		providedCompile dep_cdi_api
+		providedCompile dep_jaxrs_api 
 	}
 
 	eclipse {
@@ -64,8 +69,8 @@ project(':authority.service') {
 
 project(':authority.tools') {
 	dependencies {
-		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
-		compile 'org.bouncycastle:bcpkix-jdk15on:1.47'
+		compile dep_bcprov
+		compile dep_bcpkix
 	}
 }
 
@@ -92,7 +97,7 @@ project(':application.server') {
 	
 	dependencies {
 		runtime(project(':authority.adapter')) { transitive = false }
-		providedCompile 'javax.servlet:javax.servlet-api:3.0.1'
+		providedCompile dep_servlet_api
 	}
 }
 
@@ -102,7 +107,7 @@ project(':application.client') {
 	mainClassName = 'cavani.endorfina.app.Main'
 	
 	dependencies {
-		compile 'org.bouncycastle:bcprov-jdk15on:1.47'
+		compile dep_bcprov
 	}
 }
 

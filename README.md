@@ -136,6 +136,9 @@ Generated files:
 	
 	(Self-signed certificate)
 	cacert.pem
+	
+	(Encrypted private key, pw='secret')
+	cakey.pem
 
 **CredentialFactory**
 

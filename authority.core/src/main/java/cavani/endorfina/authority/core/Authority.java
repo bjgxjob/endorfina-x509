@@ -1,7 +1,5 @@
 package cavani.endorfina.authority.core;
 
-import static cavani.endorfina.authority.core.DirectoryConstants.CREDENTIAL_OU;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
@@ -18,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,6 +48,9 @@ public class Authority
 	Logger systemLog;
 
 	@Inject
+	AuthorityConfiguration config;
+
+	@Inject
 	Instance<DirectoryConnection> directory;
 
 	@Inject
@@ -58,17 +58,12 @@ public class Authority
 
 	protected String rootdn()
 	{
-		return CREDENTIAL_OU;
+		return config.getCredentialRootDN();
 	}
 
 	protected String dn(final String id)
 	{
 		return "uid=" + id + "," + rootdn();
-	}
-
-	protected InputStream resource(final String resource)
-	{
-		return this.getClass().getClassLoader().getResourceAsStream(resource);
 	}
 
 	protected X509Certificate getCertificate(final String id) throws Exception
@@ -108,21 +103,14 @@ public class Authority
 
 	protected X500PrivateCredential authority() throws Exception
 	{
-		try (
-			InputStream in = resource("META-INF/authority.properties"))
-		{
-			final Properties properties = new Properties();
-			properties.load(in);
+		final String _key = config.getPrivatekeyFile();
+		final String _cert = config.getCertificateFile();
+		final char[] _pw = config.getPrivatekeyPassword().toCharArray();
 
-			final String _key = properties.getProperty("authority_privatekey");
-			final String _cert = properties.getProperty("authority_certificate");
-			final char[] _pw = properties.getProperty("authority_password").toCharArray();
+		final PrivateKey key = loadAuthorityKey(_key, _pw);
+		final X509Certificate cert = loadAuthorityCert(_cert);
 
-			final PrivateKey key = loadAuthorityKey(_key, _pw);
-			final X509Certificate cert = loadAuthorityCert(_cert);
-
-			return new X500PrivateCredential(cert, key);
-		}
+		return new X500PrivateCredential(cert, key);
 	}
 
 	protected PrivateKey loadAuthorityKey(final String path, final char[] pw) throws Exception
@@ -288,7 +276,7 @@ public class Authority
 
 	public List<CredentialData> list() throws Exception
 	{
-		final List<Map<String, Object>> list = directory.get().search(CREDENTIAL_OU, new String[]
+		final List<Map<String, Object>> list = directory.get().search(rootdn(), new String[]
 		{
 			CredentialModel.ID.value,
 			CredentialModel.PW.value,

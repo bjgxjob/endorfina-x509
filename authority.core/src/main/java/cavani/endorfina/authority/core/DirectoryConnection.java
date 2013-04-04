@@ -137,6 +137,5 @@ public class DirectoryConnection implements AutoCloseable
 
 		return Collections.unmodifiableList(list);
 	}
-	// ...
 
 }

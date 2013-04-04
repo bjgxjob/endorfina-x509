@@ -3,58 +3,59 @@ package cavani.endorfina.authority.core;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
+import javax.security.auth.x500.X500Principal;
 import javax.security.auth.x500.X500PrivateCredential;
 
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.X509KeyUsage;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class CredentialFactory
 {
 
-	X500PrivateCredential createCredential(final String id, final X500PrivateCredential issuer, final KeyPair credential) throws Exception
+	X500PrivateCredential createCredential(final String id, final X500PrivateCredential issuer, final KeyPair keys) throws Exception
 	{
-		final X500NameBuilder name = new X500NameBuilder(BCStyle.INSTANCE);
+		final String signatureAlgorithm = "SHA1withRSA";
+		final X500Principal principal = new X500Principal("CN=" + id + ", OU=Endorfina, O=Cavani");
+		final X500Principal issuerPrincipal = issuer.getCertificate().getSubjectX500Principal();
 
-		name.addRDN(BCStyle.O, "Disruptive");
-		name.addRDN(BCStyle.OU, "Concept");
+		final BigInteger serial = BigInteger.valueOf(System.nanoTime());
 
-		name.addRDN(BCStyle.CN, id);
+		final Calendar date = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+		date.add(Calendar.DAY_OF_YEAR, -1);
 
-		final X500Name issuerName = X500Name.getInstance(issuer.getCertificate().getSubjectX500Principal().getEncoded());
+		final Date startDate = date.getTime();
 
-		final ContentSigner sigGen = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(issuer.getPrivateKey());
+		date.add(Calendar.YEAR, 1);
 
-		final Date startDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
-		final Date endDate = new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000);
+		final Date endDate = date.getTime();
 
-		final X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerName, BigInteger.ONE, startDate, endDate, name.build(), credential.getPublic());
-		certGen.addExtension(X509Extension.keyUsage, true, new X509KeyUsage(X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature | X509KeyUsage.keyEncipherment));
-		certGen.addExtension(X509Extension.extendedKeyUsage, true, new DERSequence(KeyPurposeId.anyExtendedKeyUsage));
+		final X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(issuerPrincipal, serial, startDate, endDate, principal, keys.getPublic());
 
-		final JcaX509ExtensionUtils x509ext = new JcaX509ExtensionUtils();
+		certificateBuilder.addExtension(X509Extension.basicConstraints, false, new BasicConstraints(false));
 
-		certGen.addExtension(X509Extension.authorityKeyIdentifier, false, x509ext.createAuthorityKeyIdentifier(issuer.getCertificate()));
-		certGen.addExtension(X509Extension.subjectKeyIdentifier, false, x509ext.createSubjectKeyIdentifier(credential.getPublic()));
+		final JcaX509ExtensionUtils x509Extension = new JcaX509ExtensionUtils();
+		certificateBuilder.addExtension(X509Extension.subjectKeyIdentifier, false, x509Extension.createSubjectKeyIdentifier(keys.getPublic()));
+		certificateBuilder.addExtension(X509Extension.authorityKeyIdentifier, false, x509Extension.createAuthorityKeyIdentifier(issuer.getCertificate()));
 
-		final X509CertificateHolder certHolder = certGen.build(sigGen);
+		final ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(BouncyCastleProvider.PROVIDER_NAME).build(issuer.getPrivateKey());
 
-		final X509Certificate cert = new JcaX509CertificateConverter().setProvider("BC").getCertificate(certHolder);
+		final X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
 
-		return new X500PrivateCredential(cert, credential.getPrivate(), id);
+		final X509Certificate certificate = new JcaX509CertificateConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME).getCertificate(certificateHolder);
+
+		return new X500PrivateCredential(certificate, keys.getPrivate(), id);
 	}
 
 }

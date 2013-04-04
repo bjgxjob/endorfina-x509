@@ -37,6 +37,21 @@ Missing
 Configuration
 -------------
 
+**Application**
+
+`/authority.core/src/main/resources/META-INF/authority.properties`
+
+	privatekey_file=(path to cakey.pem)
+	privatekey_password=(cakey.pem password)
+	certificate_file=(path to cacert.pem)
+	credential_root_dn=(ldap dn for credentials)
+
+`/authority.core/src/main/resources/META-INF/directory.properties`
+
+	url=(ldap server)
+	binddn=(ldap auth user)
+	bindpw=(ldap auth password)
+
 **Java 7**
 
 Oracle JDK requires update with Unlimited Strength Policy (key size) - not required for OpenJDK (IcedTea) afaik.
@@ -116,6 +131,7 @@ Admin Console Credential
 	/srv/Software/AuthorityServer/bin/add-user.sh
 	(ENTER, ENTER, 'system', 'secret' x 2, 'yes')
 
+
 Tools
 -----
 
@@ -186,3 +202,54 @@ Generated files:
 Binds to port 38900, implements LDAPv3 protocol and stores in `data` folder.
 
 `/authority.fakeldap/src/main/java/cavani/endorfina/authority/tools/FakeLdap38900.java`
+
+Deploy
+------
+
+On root repo folder.
+
+	mkdir authority
+	sudo ln -s `pwd`/authority /srv/
+
+(generates jar/war for JBoss in `deploy` folder) 
+
+	gradle build deploy
+	ln -s ../deploy authority
+
+(generates `cakey.pem` and `cacert.pem` in `/srv/authority` folder)
+(generates `keystore.jks` and `truststore.jks` in `/srv/authority/server` folder)
+
+	gradle :authority.tools:runAuthoritySetup
+	mkdir authority/private
+	mv authority.tools/cakey.pem authority/private/
+	mv authority.tools/cacert.pem authority/
+	
+	gradle :authority.tools:runServerCredential
+	mkdir authority/server
+	mv authority.tools/{key,trust}store.jks authority/server/
+
+LDAP server (new Terminal must stay open)
+
+	gradle :authority.fakeldap:run
+
+JBoss server (new Terminal must stay open)
+
+	/srv/Software/AuthorityServer/bin/standalone.sh
+
+(JBoss setup)
+
+	/srv/Software/AuthorityServer/bin/jboss-cli.sh --connect
+	
+	/subsystem=web/virtual-server=default-host:write-attribute(name="alias", value=["appserver"])
+	/subsystem=web/connector=https:add(socket-binding=https, scheme=https, protocol="HTTP/1.1", secure=true, enabled=true)
+	/subsystem=web/connector=https/ssl=configuration:add(certificate-key-file="/srv/authority/server/keystore.jks",ca-certificate-file="/srv/authority/server/truststore.jks",password="secret",key-alias="server",protocol="SSLv3",verify-client="true")
+	:reload
+	
+	/subsystem=security/security-domain=EndorfinaAuthority:add(cache-type="default")
+	
+	/subsystem=security/security-domain=EndorfinaAuthority/authentication=classic:add( \
+		login-modules=[{"code" => "cavani.endorfina.authority.adapter.LoginModule", "flag" => "required"}]) \
+		{allow-resource-service-restart=true}
+
+	/subsystem=deployment-scanner/scanner=authority:add(scan-interval=10000,path="/srv/authority/deploy")
+		

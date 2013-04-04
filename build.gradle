@@ -36,12 +36,34 @@ project(':authority.core') {
 		compile dep_ejb3_api
 		compile dep_cdi_api
 	}
+
+	def deployment_dep = [
+		'deployment.bcprov:1.48.0',
+		'deployment.bcpkix:1.48.0',
+		'deployment.authority.api-1.0.jar export',
+	]
+	
+	jar {
+	    manifest {
+	        attributes 'Dependencies': deployment_dep.join(',')
+	    }
+	}
 }
 
 project(':authority.adapter') {
 	dependencies {
 		compile project(':authority.api')
 		compile dep_picketbox
+	}
+
+	def deployment_dep = [
+		'org.picketbox'
+	]
+	
+	jar {
+	    manifest {
+	        attributes 'Dependencies': deployment_dep.join(',')
+	    }
 	}
 }
 
@@ -68,6 +90,21 @@ project(':authority.service') {
 }
 
 project(':authority.tools') {
+	task runAuthoritySetup(type: JavaExec, dependsOn:[classes]) {
+		main = 'cavani.endorfina.authority.tools.AuthoritySetup'
+		classpath = sourceSets.main.runtimeClasspath
+	}
+	
+	task runCredentialFactory(type: JavaExec, dependsOn:[classes]) {
+		main = 'cavani.endorfina.authority.tools.CredentialFactory'
+		classpath = sourceSets.main.runtimeClasspath
+	}
+	
+	task runServerCredential(type: JavaExec, dependsOn:[classes]) {
+		main = 'cavani.endorfina.authority.tools.ServerCredential'
+		classpath = sourceSets.main.runtimeClasspath
+	}
+	
 	dependencies {
 		compile dep_bcprov
 		compile dep_bcpkix
@@ -75,6 +112,10 @@ project(':authority.tools') {
 }
 
 project(':authority.fakeldap') {
+	apply plugin:'application'
+	
+	mainClassName = 'cavani.endorfina.authority.tools.FakeLdap38900'
+	
 	dependencies {
 		compile 'org.apache.directory.server:apacheds-protocol-ldap:2.0.0-M11'
 		compile 'org.apache.directory.server:apacheds-ldif-partition:2.0.0-M11'
@@ -96,7 +137,6 @@ project(':application.server') {
 	}
 	
 	dependencies {
-		runtime(project(':authority.adapter')) { transitive = false }
 		providedCompile dep_servlet_api
 	}
 }
@@ -116,6 +156,7 @@ task deploy {
 		'authority.api',
 		'authority.core',
 		'authority.service',
+		'authority.adapter',
 		'application.server',
 		'bcprov-jdk15on-1.48.jar',
 		'bcpkix-jdk15on-1.48.jar',

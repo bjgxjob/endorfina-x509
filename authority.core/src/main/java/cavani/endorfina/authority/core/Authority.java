@@ -30,8 +30,14 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.security.auth.x500.X500PrivateCredential;
 
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PasswordFinder;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 
 import cavani.endorfina.authority.api.CredentialData;
 import cavani.endorfina.authority.api.CredentialModel;
@@ -108,58 +114,44 @@ public class Authority
 			final Properties properties = new Properties();
 			properties.load(in);
 
-			final String _key = properties.getProperty("issuer_privatekey");
-			final String _cert = properties.getProperty("issuer_certificate");
-			final char[] _pw = properties.getProperty("issuer_password").toCharArray();
+			final String _key = properties.getProperty("authority_privatekey");
+			final String _cert = properties.getProperty("authority_certificate");
+			final char[] _pw = properties.getProperty("authority_password").toCharArray();
 
-			final PasswordFinder pw = new PasswordFinder()
-			{
-
-				@Override
-				public char[] getPassword()
-				{
-					return _pw;
-				}
-
-			};
-
-			final PrivateKey key = issuerkey(_key, pw);
-			final X509Certificate cert = issuercert(_cert, pw);
+			final PrivateKey key = loadAuthorityKey(_key, _pw);
+			final X509Certificate cert = loadAuthorityCert(_cert);
 
 			return new X500PrivateCredential(cert, key);
 		}
 	}
 
-	protected PrivateKey issuerkey(final String path, final PasswordFinder pw) throws Exception
+	protected PrivateKey loadAuthorityKey(final String path, final char[] pw) throws Exception
 	{
 		try (
 			FileReader file = new FileReader(path);
-			PEMReader pem = new PEMReader(file, pw))
+			PEMParser pem = new PEMParser(file))
 		{
-			return (PrivateKey) pem.readObject();
+			final Object object = pem.readObject();
+			final PEMDecryptorProvider dec = new JcePEMDecryptorProviderBuilder().build(pw);
+			final PEMEncryptedKeyPair key = (PEMEncryptedKeyPair) object;
+			final PrivateKeyInfo privInfo = key.decryptKeyPair(dec).getPrivateKeyInfo();
+
+			final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+			return converter.getPrivateKey(privInfo);
 		}
 	}
 
-	protected X509Certificate issuercert(final String path, final PasswordFinder pw) throws Exception
+	protected X509Certificate loadAuthorityCert(final String path) throws Exception
 	{
 		try (
 			FileReader file = new FileReader(path);
-			PEMReader pem = new PEMReader(file, pw))
+			PEMParser pem = new PEMParser(file))
 		{
-			for (String line = null; (line = pem.readLine()) != null;)
-			{
-				if (line.startsWith("-----BEGIN "))
-				{
-					pem.reset();
-					break;
-				}
-				else
-				{
-					pem.mark(0);
-				}
-			}
+			final Object object = pem.readObject();
+			final X509CertificateHolder holder = (X509CertificateHolder) object;
 
-			return (X509Certificate) pem.readObject();
+			final JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider("BC");
+			return converter.getCertificate(holder);
 		}
 	}
 

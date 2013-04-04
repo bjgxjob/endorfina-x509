@@ -13,8 +13,8 @@ subprojects {
 	}
 }
 
-def dep_bcprov = 'org.bouncycastle:bcprov-jdk15on:1.47'
-def dep_bcpkix = 'org.bouncycastle:bcpkix-jdk15on:1.47'
+def dep_bcprov = 'org.bouncycastle:bcprov-jdk15on:1.48'
+def dep_bcpkix = 'org.bouncycastle:bcpkix-jdk15on:1.48'
 
 def dep_ejb3_api = 'org.jboss.spec.javax.ejb:jboss-ejb-api_3.1_spec:1.0.2.Final'
 def dep_cdi_api = 'javax.enterprise:cdi-api:1.0'
@@ -117,8 +117,8 @@ task deploy {
 		'authority.core',
 		'authority.service',
 		'application.server',
-		'bcprov-jdk15on-1.47.jar',
-		'bcpkix-jdk15on-1.47.jar',
+		'bcprov-jdk15on-1.48.jar',
+		'bcpkix-jdk15on-1.48.jar',
 	]
 
 	File deploy = mkdir("deploy")

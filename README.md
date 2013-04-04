@@ -26,7 +26,7 @@ Gears
 Featuring
 ---------
 
-* BouncyCastle 1.47
+* BouncyCastle 1.48
 * JBoss AS 7.1
 
 Missing

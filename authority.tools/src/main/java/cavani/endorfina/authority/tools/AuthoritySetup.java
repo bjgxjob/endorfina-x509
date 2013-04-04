@@ -30,7 +30,9 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
@@ -57,6 +59,7 @@ public final class AuthoritySetup
 
 		storePKCS12(cn, credential, cn + ".p12", "secret".toCharArray());
 		storePEM(credential.getCertificate(), "cacert.pem");
+		storePEM(credential.getPrivateKey(), "cakey.pem", "secret".toCharArray());
 
 		System.out.println("done!");
 	}
@@ -131,9 +134,21 @@ public final class AuthoritySetup
 	{
 		try (
 			Writer out = Files.newBufferedWriter(Paths.get(file), Charset.forName("UTF-8"), StandardOpenOption.CREATE);
-			PEMWriter pem = new PEMWriter(out, BouncyCastleProvider.PROVIDER_NAME);)
+			PEMWriter pem = new PEMWriter(out);)
 		{
 			pem.writeObject(object);
+		}
+	}
+
+	static void storePEM(final Object object, final String file, final char[] pw) throws Exception
+	{
+		try (
+			Writer out = Files.newBufferedWriter(Paths.get(file), Charset.forName("UTF-8"), StandardOpenOption.CREATE);
+			PEMWriter pem = new PEMWriter(out);)
+		{
+			final PEMEncryptor enc = new JcePEMEncryptorBuilder("DES-EDE3").build(pw);
+			pem.writeObject(object, enc);
+
 		}
 	}
 

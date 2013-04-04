@@ -5,6 +5,7 @@ bin
 build
 /Authority.p12
 /cacert.pem
+/cakey.pem
 /Credential_cert.pem
 /Credential_key.pem
 /Credential.p12

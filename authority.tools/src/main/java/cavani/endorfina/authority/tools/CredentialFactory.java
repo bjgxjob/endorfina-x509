@@ -154,7 +154,7 @@ public final class CredentialFactory
 	{
 		try (
 			Writer out = Files.newBufferedWriter(Paths.get(file), Charset.forName("UTF-8"), StandardOpenOption.CREATE);
-			PEMWriter pem = new PEMWriter(out, BouncyCastleProvider.PROVIDER_NAME);)
+			PEMWriter pem = new PEMWriter(out);)
 		{
 			pem.writeObject(object);
 		}

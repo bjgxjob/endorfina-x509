@@ -46,13 +46,13 @@ Configuration
 	privatekey_file=(path to cakey.pem)
 	privatekey_password=(cakey.pem password)
 	certificate_file=(path to cacert.pem)
-	credential_root_dn=(ldap dn for credentials)
 
 `/authority.core/src/main/resources/META-INF/directory.properties`
 
 	url=(ldap server)
 	binddn=(ldap auth user)
 	bindpw=(ldap auth password)
+	credential_root_dn=(ldap dn for credentials)
 
 **Java 7**
 

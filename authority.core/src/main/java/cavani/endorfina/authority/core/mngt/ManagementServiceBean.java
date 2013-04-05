@@ -68,6 +68,20 @@ public class ManagementServiceBean implements ManagementService
 	}
 
 	@Override
+	public CredentialData credentialData(final String id)
+	{
+		try
+		{
+			systemLog.info("credential: " + id);
+			return manager.credential(id);
+		}
+		catch (final Exception e)
+		{
+			throw new EJBException("Error get credential (data)!", e);
+		}
+	}
+
+	@Override
 	public List<CredentialData> credentialList()
 	{
 		try

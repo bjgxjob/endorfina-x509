@@ -1,6 +1,5 @@
 package cavani.endorfina.authority.core.data;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import cavani.endorfina.authority.api.model.CredentialData;
@@ -12,10 +11,12 @@ public interface CredentialStore
 
 	String remove(final String id) throws Exception;
 
+	CredentialData getData(String id) throws Exception;
+
+	byte[] getCertificate(final String id) throws Exception;
+
+	byte[] getP12(final String id) throws Exception;
+
 	List<CredentialData> list() throws Exception;
-
-	X509Certificate getCertificate(final String id) throws Exception;
-
-	byte[] getP12Raw(final String id) throws Exception;
 
 }

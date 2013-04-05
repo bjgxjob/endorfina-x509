@@ -29,11 +29,17 @@ public class AuthorityManager
 
 	public byte[] p12(final String id) throws Exception
 	{
-		return store.getP12Raw(id);
+		return store.getP12(id);
+	}
+
+	public CredentialData credential(final String id) throws Exception
+	{
+		return store.getData(id);
 	}
 
 	public List<CredentialData> credentials() throws Exception
 	{
 		return store.list();
 	}
+
 }

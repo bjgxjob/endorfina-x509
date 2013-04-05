@@ -16,6 +16,8 @@ public interface ManagementService
 
 	byte[] pkcs12(String id);
 
+	CredentialData credentialData(String id);
+
 	List<CredentialData> credentialList();
 
 }

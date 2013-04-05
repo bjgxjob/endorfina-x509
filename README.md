@@ -10,7 +10,7 @@ https://github.com/cirocavani/endorfina-x509
 Gears
 -----
 
-**X.509**
+**Authority X.509**
 
 * Authority key pair generation (self-signed)
 * Client key pair generation (Authority signed)

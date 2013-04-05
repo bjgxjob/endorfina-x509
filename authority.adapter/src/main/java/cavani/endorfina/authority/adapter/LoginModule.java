@@ -16,6 +16,8 @@ import cavani.endorfina.authority.api.auth.AuthenticationService;
 public class LoginModule extends BaseCertLoginModule
 {
 
+	private static final String AUTHENTICATION_SERVICE = "java:global/authority.core-1.0/AuthenticationServiceBean!cavani.endorfina.authority.api.auth.AuthenticationService";
+
 	Logger systemLog = Logger.getLogger(LoginModule.class.getName());
 
 	@Override
@@ -24,7 +26,7 @@ public class LoginModule extends BaseCertLoginModule
 		try (
 			JndiConnection jndi = new JndiConnection())
 		{
-			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, "java:module/AuthenticationServiceBean");
+			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, AUTHENTICATION_SERVICE);
 			return auth.validateCredential(alias, cert);
 		}
 		catch (final Exception e)

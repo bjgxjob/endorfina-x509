@@ -57,7 +57,8 @@ project(':authority.adapter') {
 	}
 
 	def deployment_dep = [
-		'org.picketbox'
+		'org.picketbox',
+		'deployment.authority.api-1.0.jar',
 	]
 	
 	jar {
@@ -86,6 +87,16 @@ project(':authority.service') {
 				facet name: 'jst.jaxrs', version: '1.1'
 			}
 		}
+	}
+
+	def deployment_dep = [
+		'deployment.authority.api-1.0.jar',
+	]
+	
+	war {
+	    manifest {
+	        attributes 'Dependencies': deployment_dep.join(',')
+	    }
 	}
 }
 

@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core.data;
+package cavani.endorfina.authority.core.ldap;
 
 import java.util.Hashtable;
 
@@ -19,7 +19,7 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-public abstract class DirectoryEntry implements DirContext
+public abstract class AbstractValue implements DirContext
 {
 
 	protected Attributes attributes = new BasicAttributes(true);

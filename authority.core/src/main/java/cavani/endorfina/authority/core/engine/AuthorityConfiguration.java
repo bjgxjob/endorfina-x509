@@ -7,6 +7,7 @@ import static cavani.endorfina.authority.core.engine.AuthorityConstants.AUTHORIT
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -14,6 +15,7 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @Singleton
 @Startup
@@ -24,6 +26,9 @@ public class AuthorityConfiguration
 
 	private static final String DEFAULT_CONFIG_PROPERTIES = "META-INF/authority.properties";
 
+	@Inject
+	Logger systemLog;
+
 	String certificateFile;
 
 	String privatekeyFile;
@@ -33,15 +38,24 @@ public class AuthorityConfiguration
 	@PostConstruct
 	void setup() throws Exception
 	{
+		systemLog.info("AuthorityConfiguration setup...");
+
 		final Properties config = new Properties();
 		try (
 			InputStream in = getConfigProperties())
 		{
 			config.load(in);
 		}
-		certificateFile = config.getProperty(AUTHORITY_CONFIG_CERTIFICATE_FILE);
-		privatekeyFile = config.getProperty(AUTHORITY_CONFIG_PRIVATEKEY_FILE);
-		privatekeyPassword = config.getProperty(AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD);
+		certificateFile = getString(config, AUTHORITY_CONFIG_CERTIFICATE_FILE);
+		privatekeyFile = getString(config, AUTHORITY_CONFIG_PRIVATEKEY_FILE);
+		privatekeyPassword = getString(config, AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD);
+	}
+
+	String getString(final Properties config, final String key)
+	{
+		final String value = config.getProperty(key);
+		systemLog.info(key + "=" + value);
+		return value;
 	}
 
 	InputStream getConfigProperties() throws IOException

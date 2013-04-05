@@ -1,11 +1,11 @@
-package cavani.endorfina.authority.core.data;
+package cavani.endorfina.authority.core.ldap;
 
 import cavani.endorfina.authority.api.model.CredentialModel;
 
-public class CredentialEntry extends DirectoryEntry
+public class CredentialValue extends AbstractValue
 {
 
-	public CredentialEntry(final String id)
+	public CredentialValue(final String id)
 	{
 		objectClasses.add("extensibleObject");
 		objectClasses.add("account");

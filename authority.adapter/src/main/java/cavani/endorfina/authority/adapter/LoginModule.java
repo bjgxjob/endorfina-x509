@@ -24,7 +24,7 @@ public class LoginModule extends BaseCertLoginModule
 		try (
 			JndiConnection jndi = new JndiConnection())
 		{
-			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, "java:global/authority.core/AuthenticationServiceBean!cavani.endorfina.authority.core.auth.AuthenticationService");
+			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, "java:module/AuthenticationServiceBean");
 			return auth.validateCredential(alias, cert);
 		}
 		catch (final Exception e)

@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core.data;
+package cavani.endorfina.authority.core.ldap;
 
 public abstract class DirectoryQuery
 {

@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core.data;
+package cavani.endorfina.authority.core.ldap;
 
 import java.util.Collections;
 import java.util.Hashtable;
@@ -62,7 +62,7 @@ public class DirectoryConnection implements AutoCloseable
 		return context != null;
 	}
 
-	public void persist(final String dn, final DirectoryEntry entry) throws NamingException
+	public void persist(final String dn, final AbstractValue entry) throws NamingException
 	{
 		context.bind(dn, entry);
 	}

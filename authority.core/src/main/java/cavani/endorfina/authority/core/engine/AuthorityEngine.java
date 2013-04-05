@@ -1,5 +1,9 @@
 package cavani.endorfina.authority.core.engine;
 
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.CREDENTIAL_KEYSTORE_TYPE_PKCS12;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.CREDENTIAL_KEY_ALGORITHM;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.CREDENTIAL_KEY_SIZE;
+
 import java.io.ByteArrayOutputStream;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -16,6 +20,8 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.security.auth.x500.X500PrivateCredential;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import cavani.endorfina.authority.core.data.CredentialStore;
 
@@ -44,16 +50,16 @@ public class AuthorityEngine
 
 	private KeyPair generateKeys() throws Exception
 	{
-		final KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA", "BC");
+		final KeyPairGenerator kpg = KeyPairGenerator.getInstance(CREDENTIAL_KEY_ALGORITHM, BouncyCastleProvider.PROVIDER_NAME);
 
-		kpg.initialize(2048, new SecureRandom());
+		kpg.initialize(CREDENTIAL_KEY_SIZE, new SecureRandom());
 
 		return kpg.generateKeyPair();
 	}
 
 	private byte[] pkcs12(final String id, final char[] pw, final X500PrivateCredential credential, final X509Certificate issuerCertificate) throws Exception
 	{
-		final KeyStore keyStore = KeyStore.getInstance("PKCS12", "BC");
+		final KeyStore keyStore = KeyStore.getInstance(CREDENTIAL_KEYSTORE_TYPE_PKCS12, BouncyCastleProvider.PROVIDER_NAME);
 
 		keyStore.load(null, null);
 
@@ -88,12 +94,11 @@ public class AuthorityEngine
 		final byte[] p12 = pkcs12(id, pw, credential, authority.getCertificate());
 		final byte[] cert = credential.getCertificate().getEncoded();
 
+		final String dn = credentialStore.persist(id, p12, cert, pw);
+
 		systemLog.info(id + "/pw = " + String.valueOf(pw));
 		systemLog.info(id + "/p12 = " + p12.length);
 		systemLog.info(id + "/cert = " + cert.length);
-
-		final String dn = credentialStore.persist(id, p12, cert, pw);
-
 		systemLog.info(id + "/dn = " + dn);
 	}
 
@@ -102,15 +107,16 @@ public class AuthorityEngine
 	{
 		try
 		{
-			systemLog.info("Gerando credencial: " + id);
+			systemLog.info("Generating credential: " + id);
+			final long t = System.currentTimeMillis();
 
 			generate(id);
 
-			systemLog.info("Credencial gerada: " + id);
+			systemLog.info(String.format("Credential generated: '%s' (%,.3fs)", id, (System.currentTimeMillis() - t) / 1000.0));
 		}
 		catch (final Throwable e)
 		{
-			systemLog.log(Level.INFO, "Erro criando credencial: " + id, e);
+			systemLog.log(Level.INFO, "Error generating credential: " + id, e);
 		}
 	}
 }

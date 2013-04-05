@@ -1,5 +1,8 @@
 package cavani.endorfina.authority.core.engine;
 
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.CREDENTIAL_SIGNATURE_ALGORITHM;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.CREDENTIAL_PRINCIPAL_FORMAT;
+
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.cert.X509Certificate;
@@ -26,8 +29,7 @@ public class CredentialFactory
 
 	X500PrivateCredential createCredential(final String id, final X500PrivateCredential issuer, final KeyPair keys) throws Exception
 	{
-		final String signatureAlgorithm = "SHA1withRSA";
-		final X500Principal principal = new X500Principal("CN=" + id + ", OU=Endorfina, O=Cavani");
+		final X500Principal principal = new X500Principal(String.format(CREDENTIAL_PRINCIPAL_FORMAT, id));
 		final X500Principal issuerPrincipal = issuer.getCertificate().getSubjectX500Principal();
 
 		final BigInteger serial = BigInteger.valueOf(System.nanoTime());
@@ -49,7 +51,7 @@ public class CredentialFactory
 		certificateBuilder.addExtension(X509Extension.subjectKeyIdentifier, false, x509Extension.createSubjectKeyIdentifier(keys.getPublic()));
 		certificateBuilder.addExtension(X509Extension.authorityKeyIdentifier, false, x509Extension.createAuthorityKeyIdentifier(issuer.getCertificate()));
 
-		final ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).setProvider(BouncyCastleProvider.PROVIDER_NAME).build(issuer.getPrivateKey());
+		final ContentSigner contentSigner = new JcaContentSignerBuilder(CREDENTIAL_SIGNATURE_ALGORITHM).setProvider(BouncyCastleProvider.PROVIDER_NAME).build(issuer.getPrivateKey());
 
 		final X509CertificateHolder certificateHolder = certificateBuilder.build(contentSigner);
 

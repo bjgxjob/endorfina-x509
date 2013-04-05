@@ -10,6 +10,7 @@ import javax.security.auth.x500.X500PrivateCredential;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -45,7 +46,7 @@ public class AuthorityCredential
 			final PEMEncryptedKeyPair key = (PEMEncryptedKeyPair) object;
 			final PrivateKeyInfo privInfo = key.decryptKeyPair(dec).getPrivateKeyInfo();
 
-			final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+			final JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
 			return converter.getPrivateKey(privInfo);
 		}
 	}
@@ -59,7 +60,7 @@ public class AuthorityCredential
 			final Object object = pem.readObject();
 			final X509CertificateHolder holder = (X509CertificateHolder) object;
 
-			final JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider("BC");
+			final JcaX509CertificateConverter converter = new JcaX509CertificateConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
 			return converter.getCertificate(holder);
 		}
 	}

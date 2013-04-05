@@ -12,12 +12,16 @@ import java.util.Map;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import cavani.endorfina.authority.api.model.CredentialData;
 import cavani.endorfina.authority.api.model.CredentialModel;
 import cavani.endorfina.authority.core.data.CredentialStore;
 
 public class DirectoryStore implements CredentialStore
 {
+
+	private static final String CERTIFICATE_TYPE_X509 = "X.509";
 
 	@Inject
 	DirectoryConfiguration config;
@@ -113,7 +117,7 @@ public class DirectoryStore implements CredentialStore
 		try (
 			InputStream in = new ByteArrayInputStream(result))
 		{
-			final CertificateFactory factory = CertificateFactory.getInstance("X.509", "BC");
+			final CertificateFactory factory = CertificateFactory.getInstance(CERTIFICATE_TYPE_X509, BouncyCastleProvider.PROVIDER_NAME);
 			return (X509Certificate) factory.generateCertificate(in);
 		}
 	}

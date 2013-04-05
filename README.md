@@ -33,6 +33,8 @@ Missing
 -------
 
 * Tests
+* Automated deploy setup
+* IdM and Auth deploy separation
 
 Configuration
 -------------

@@ -1,6 +1,6 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.data;
 
-import cavani.endorfina.authority.api.CredentialModel;
+import cavani.endorfina.authority.api.model.CredentialModel;
 
 public class CredentialEntry extends DirectoryEntry
 {

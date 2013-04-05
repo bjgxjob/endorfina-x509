@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.engine;
 
 public final class AuthorityConstants
 {
@@ -8,8 +8,6 @@ public final class AuthorityConstants
 	public static final String AUTHORITY_CONFIG_PRIVATEKEY_FILE = "privatekey_file";
 
 	public static final String AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD = "privatekey_password";
-
-	public static final String AUTHORITY_CONFIG_CREDENTIAL_ROOT_DN = "credential_root_dn";
 
 	private AuthorityConstants()
 	{

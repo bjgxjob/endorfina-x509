@@ -11,7 +11,7 @@ import javax.security.auth.login.LoginException;
 import org.jboss.security.SimpleGroup;
 import org.jboss.security.auth.spi.BaseCertLoginModule;
 
-import cavani.endorfina.authority.api.AuthenticationService;
+import cavani.endorfina.authority.api.auth.AuthenticationService;
 
 public class LoginModule extends BaseCertLoginModule
 {
@@ -24,7 +24,7 @@ public class LoginModule extends BaseCertLoginModule
 		try (
 			JndiConnection jndi = new JndiConnection())
 		{
-			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, "java:global/authority.core/AuthenticationServiceBean!cavani.endorfina.authority.core.AuthenticationService");
+			final AuthenticationService auth = jndi.lookup(AuthenticationService.class, "java:global/authority.core/AuthenticationServiceBean!cavani.endorfina.authority.core.auth.AuthenticationService");
 			return auth.validateCredential(alias, cert);
 		}
 		catch (final Exception e)

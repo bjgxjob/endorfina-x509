@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.api;
+package cavani.endorfina.authority.api.model;
 
 public enum CredentialModel
 {

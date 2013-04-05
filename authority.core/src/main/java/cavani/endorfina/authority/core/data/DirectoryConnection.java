@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.data;
 
 import java.util.Collections;
 import java.util.Hashtable;

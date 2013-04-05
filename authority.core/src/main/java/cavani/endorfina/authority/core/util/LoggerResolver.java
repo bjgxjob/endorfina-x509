@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.util;
 
 import java.util.logging.Logger;
 

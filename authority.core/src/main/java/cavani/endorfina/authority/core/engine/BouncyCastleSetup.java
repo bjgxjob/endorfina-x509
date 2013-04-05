@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.engine;
 
 import java.security.Provider;
 import java.security.Security;

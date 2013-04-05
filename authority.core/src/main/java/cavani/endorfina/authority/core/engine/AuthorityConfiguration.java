@@ -1,9 +1,8 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.engine;
 
-import static cavani.endorfina.authority.core.AuthorityConstants.AUTHORITY_CONFIG_CERTIFICATE_FILE;
-import static cavani.endorfina.authority.core.AuthorityConstants.AUTHORITY_CONFIG_CREDENTIAL_ROOT_DN;
-import static cavani.endorfina.authority.core.AuthorityConstants.AUTHORITY_CONFIG_PRIVATEKEY_FILE;
-import static cavani.endorfina.authority.core.AuthorityConstants.AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.AUTHORITY_CONFIG_CERTIFICATE_FILE;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.AUTHORITY_CONFIG_PRIVATEKEY_FILE;
+import static cavani.endorfina.authority.core.engine.AuthorityConstants.AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +30,6 @@ public class AuthorityConfiguration
 
 	String privatekeyPassword;
 
-	String credentialRootDN;
-
 	@PostConstruct
 	void setup() throws Exception
 	{
@@ -45,7 +42,6 @@ public class AuthorityConfiguration
 		certificateFile = config.getProperty(AUTHORITY_CONFIG_CERTIFICATE_FILE);
 		privatekeyFile = config.getProperty(AUTHORITY_CONFIG_PRIVATEKEY_FILE);
 		privatekeyPassword = config.getProperty(AUTHORITY_CONFIG_PRIVATEKEY_PASSWORD);
-		credentialRootDN = config.getProperty(AUTHORITY_CONFIG_CREDENTIAL_ROOT_DN);
 	}
 
 	InputStream getConfigProperties() throws IOException
@@ -66,11 +62,6 @@ public class AuthorityConfiguration
 	public String getPrivatekeyPassword()
 	{
 		return privatekeyPassword;
-	}
-
-	public String getCredentialRootDN()
-	{
-		return credentialRootDN;
 	}
 
 }

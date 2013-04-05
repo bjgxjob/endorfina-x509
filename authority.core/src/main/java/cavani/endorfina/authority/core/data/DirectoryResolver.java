@@ -1,4 +1,4 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.data;
 
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;

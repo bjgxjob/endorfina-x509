@@ -1,8 +1,9 @@
-package cavani.endorfina.authority.core;
+package cavani.endorfina.authority.core.data;
 
-import static cavani.endorfina.authority.core.DirectoryConstants.DIRECTORY_CONFIG_BINDDN;
-import static cavani.endorfina.authority.core.DirectoryConstants.DIRECTORY_CONFIG_BINDPW;
-import static cavani.endorfina.authority.core.DirectoryConstants.DIRECTORY_CONFIG_URL;
+import static cavani.endorfina.authority.core.data.DirectoryConstants.DIRECTORY_CONFIG_BINDDN;
+import static cavani.endorfina.authority.core.data.DirectoryConstants.DIRECTORY_CONFIG_BINDPW;
+import static cavani.endorfina.authority.core.data.DirectoryConstants.DIRECTORY_CONFIG_CREDENTIAL_ROOT_DN;
+import static cavani.endorfina.authority.core.data.DirectoryConstants.DIRECTORY_CONFIG_URL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,8 @@ public class DirectoryConfiguration
 
 	String bindpw;
 
+	String credentialRootDN;
+
 	@PostConstruct
 	void setup() throws Exception
 	{
@@ -42,6 +45,7 @@ public class DirectoryConfiguration
 		url = config.getProperty(DIRECTORY_CONFIG_URL);
 		binddn = config.getProperty(DIRECTORY_CONFIG_BINDDN);
 		bindpw = config.getProperty(DIRECTORY_CONFIG_BINDPW);
+		credentialRootDN = config.getProperty(DIRECTORY_CONFIG_CREDENTIAL_ROOT_DN);
 	}
 
 	InputStream getConfigProperties() throws IOException
@@ -62,6 +66,11 @@ public class DirectoryConfiguration
 	public String getBindpw()
 	{
 		return bindpw;
+	}
+
+	public String getCredentialRootDN()
+	{
+		return credentialRootDN;
 	}
 
 }

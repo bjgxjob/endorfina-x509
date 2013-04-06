@@ -223,9 +223,6 @@ task bouncycastle(dependsOn: configurations.bouncycastle) {
 	
 	def module_xml = file(new File(main, 'module.xml'))
 	module_xml.createNewFile()
-	
-	def bcpkix_file = 'bcpkix-jdk15on-1.48.jar'
-	def bcprov_file = 'bcprov-jdk15on-1.48.jar'
 
 	def xml = new groovy.xml.MarkupBuilder(module_xml.newWriter())
 	

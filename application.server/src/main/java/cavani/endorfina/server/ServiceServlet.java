@@ -25,7 +25,7 @@ public class ServiceServlet extends HttpServlet
 
 		final PrintWriter writer = response.getWriter();
 		writer.println("<html><head></head><body>");
-		writer.println("<h1>Olá, " + principal + "!</h1>");
+		writer.println("<h1>Hello, " + principal + "!</h1>");
 		writer.println("<p>" + String.format("%1$tF %1$tH:%1$tM:%1$tS", new Date()) + "</p>");
 		writer.println("<p>" + (sslSession == null ? "(no ssl)" : sslSession) + "</p>");
 		writer.println("</body></html>");

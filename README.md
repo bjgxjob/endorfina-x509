@@ -213,10 +213,9 @@ On root repo folder.
 	mkdir authority
 	sudo ln -s `pwd`/authority /srv/
 
-(generates jar/war for JBoss in `deploy` folder) 
+(generates jar/war for JBoss in `authority/deploy` folder) 
 
-	gradle build deploy
-	ln -s ../deploy authority
+	gradle deploy
 
 (generates `cakey.pem` and `cacert.pem` in `/srv/authority` folder)
 (generates `keystore.jks` and `truststore.jks` in `/srv/authority/server` folder)
@@ -229,6 +228,11 @@ On root repo folder.
 	gradle :authority.tools:runServerCredential
 	mkdir authority/server
 	mv authority.tools/{key,trust}store.jks authority/server/
+
+(generates `org.bouncycastle` module for JBoss in `module` folder, and copy to JBoss)
+
+	gradle bouncycastle
+	cp -ru module/* /srv/Software/AuthorityServer/modules/
 
 LDAP server (new Terminal must stay open)
 
@@ -258,4 +262,61 @@ JBoss server (new Terminal must stay open)
 		{allow-resource-service-restart=true}
 
 	/subsystem=deployment-scanner/scanner=authority:add(scan-interval=10000,path="/srv/authority/deploy")
-		
+
+Usage
+-----
+
+(Requesting a Credential)
+
+	curl http://127.0.0.1:8080/authority/idm/request
+	...
+	844a91f95c0545ef9ea0e99ea260ed46
+
+(Getting Credential data)
+
+	curl http://127.0.0.1:8080/authority/idm/data?id=844a91f95c0545ef9ea0e99ea260ed46
+	...
+	Identity: 844a91f95c0545ef9ea0e99ea260ed46
+	Password: 12617670
+	Created: 20130406014337.799Z
+
+(Getting Credential PKCS12)
+
+	curl http://127.0.0.1:8080/authority/idm/pkcs12?id=844a91f95c0545ef9ea0e99ea260ed46 > Credential.p12
+	openssl pkcs12 -in Credential.p12 -passin pass:12617670 -passout pass:12617670
+	...
+	MAC verified OK
+	Bag Attributes
+	    localKeyID: 7C F2 DE 7A 56 DE F3 64 F7 19 69 08 D0 CA BC 79 AD 50 CE DE 
+	    friendlyName: 844a91f95c0545ef9ea0e99ea260ed46
+	Key Attributes: <No Attributes>
+	-----BEGIN ENCRYPTED PRIVATE KEY-----
+	(...)
+	-----END ENCRYPTED PRIVATE KEY-----
+	Bag Attributes
+	    localKeyID: 7C F2 DE 7A 56 DE F3 64 F7 19 69 08 D0 CA BC 79 AD 50 CE DE 
+	    friendlyName: 844a91f95c0545ef9ea0e99ea260ed46
+	subject=/O=Cavani/OU=Endorfina/CN=844a91f95c0545ef9ea0e99ea260ed46
+	issuer=/O=Cavani/OU=Endorfina/CN=Authority
+	-----BEGIN CERTIFICATE-----
+	(...)
+	-----END CERTIFICATE-----
+	Bag Attributes: <Empty Attributes>
+	subject=/O=Cavani/OU=Endorfina/CN=Authority
+	issuer=/O=Cavani/OU=Endorfina/CN=Authority
+	-----BEGIN CERTIFICATE-----
+	(...)
+	-----END CERTIFICATE-----
+
+(Testing Credential)
+
+	gradle :application.client:run -Pp12=`pwd`/Credential.p12 -Ppw=12617670
+	...
+	Client Application!
+	P12: REPO/Credential.p12
+	PW: 12617670
+	[Received] <html><head></head><body>
+	[Received] <h1>Hello, 844a91f95c0545ef9ea0e99ea260ed46!</h1>
+	[Received] <p>2013-04-06 00:01:11</p>
+	[Received] <p>515f8ff659963e43278620a629fb1ed9f8d8e37d3c0b2b23c5180c2edb8c87d6</p>
+	[Received] </body></html>

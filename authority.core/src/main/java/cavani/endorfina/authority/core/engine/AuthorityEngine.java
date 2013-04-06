@@ -94,12 +94,11 @@ public class AuthorityEngine
 		final byte[] p12 = pkcs12(id, pw, credential, authority.getCertificate());
 		final byte[] cert = credential.getCertificate().getEncoded();
 
-		final String dn = credentialStore.persist(id, p12, cert, pw);
-
 		systemLog.info(id + "/pw = " + String.valueOf(pw));
 		systemLog.info(id + "/p12 = " + p12.length);
 		systemLog.info(id + "/cert = " + cert.length);
-		systemLog.info(id + "/dn = " + dn);
+
+		credentialStore.persist(id, p12, cert, pw);
 	}
 
 	@Asynchronous

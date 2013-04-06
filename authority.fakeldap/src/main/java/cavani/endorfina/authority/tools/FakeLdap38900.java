@@ -204,7 +204,7 @@ public class FakeLdap38900
 		}
 
 		service.setAllowAnonymousAccess(false);
-		service.setAccessControlEnabled(true);
+		service.setAccessControlEnabled(false);
 	}
 
 }

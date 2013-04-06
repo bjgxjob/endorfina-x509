@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.Provider;
+import java.security.Security;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -19,6 +21,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 public final class Main
 {
 
@@ -28,13 +32,20 @@ public final class Main
 
 	public static void main(final String[] args) throws Exception
 	{
-		final String id = "credential.p12";
-		final char[] pw = "secret".toCharArray();
+		System.out.println("Client Application!");
+
+		bc();
+
+		final String p12 = args[0];
+		final String pw = args[1];
+
+		System.out.println("P12: " + p12);
+		System.out.println("PW: " + pw);
 
 		final URL url = new URL("https://127.0.0.1:8443/server/Service");
 
 		final HttpsURLConnection cx = (HttpsURLConnection) url.openConnection();
-		ssl(cx, id, pw);
+		ssl(cx, p12, pw.toCharArray());
 
 		try (
 			final InputStream in = cx.getInputStream();
@@ -46,6 +57,15 @@ public final class Main
 			{
 				System.out.println("[Received] " + line);
 			}
+		}
+	}
+
+	static void bc()
+	{
+		if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
+		{
+			final Provider provider = new BouncyCastleProvider();
+			Security.addProvider(provider);
 		}
 	}
 
@@ -115,7 +135,7 @@ public final class Main
 
 	static KeyStore credential(final String path, final char[] secret) throws Exception
 	{
-		final KeyStore keyStore = KeyStore.getInstance("PKCS12", "BC");
+		final KeyStore keyStore = KeyStore.getInstance("PKCS12", BouncyCastleProvider.PROVIDER_NAME);
 		try (
 			FileInputStream in = new FileInputStream(path))
 		{

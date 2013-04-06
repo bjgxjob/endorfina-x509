@@ -23,6 +23,7 @@ public class LoginModule extends BaseCertLoginModule
 	@Override
 	protected boolean validateCredential(final String alias, final X509Certificate cert)
 	{
+		systemLog.info("Validating Credential for '" + alias + "'");
 		try (
 			JndiConnection jndi = new JndiConnection())
 		{
